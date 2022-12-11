@@ -1,0 +1,37 @@
+# our api tool
+fastapi
+
+# our server
+uvicorn
+
+# for templates
+jinja2
+
+# for static files
+aiofiles
+
+# for db
+sqlalchemy
+psycopg2
+
+# for load env veriables
+python-dotenv
+
+# for email validation
+pydantic[email]
+
+# for hashing
+passlib[bcrypt]
+
+# for testing
+# pytest
+# requests
+
+# for pre commit
+# pre-commit
+
+# for jwt tokens
+python-jose
+
+# for accessing form data
+python-multipart
