@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean,Date, ForeignKey
+from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from db.base_class import Base
+
 
 class User_Account(Base):
     id = Column(Integer, primary_key=True, index=True)
@@ -11,10 +12,8 @@ class User_Account(Base):
     regist_date = Column(Date)
     rate = Column(Integer, nullable=False)
     user_role = Column(String, nullable=False)
-    # tasks = relationship("Task", back_populates="owner")
-    # activity = relationship("Activity_log")
-    # rate_stat = relationship("Rate_Statistic")
-    
+
+
 class Activity_log(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("user_account.id"))
@@ -24,7 +23,7 @@ class Activity_log(Base):
     operation_value = Column(String, nullable=False)
     activity_date = Column(Date)
     additional_info = Column(String, nullable=False)
-    
+
 
 class Rate_Statistic(Base):
     id = Column(Integer, primary_key=True, index=True)

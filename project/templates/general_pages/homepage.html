@@ -2,7 +2,7 @@
 
 
 {% block title %}
-  <title>Job Board</title>
+  <title>Task Board</title>
 {% endblock %}
 
 {% block content %}
@@ -12,13 +12,13 @@
   <div class="container">
   <div class="row">
     <div class="col">
-      <h1 class="display-5">Find Jobs..</h1>
+      <h1 class="display-5">Find Tasks..</h1>
     </div>
   </div>
   <div class="row">
-      {% for job in jobs %}
+      {% for task in tasks %}
         <div class="col-lg-4 col-md-3 col-sm-10 mr-auto">
-          {% with obj=job %}
+          {% with obj=task %}
       		{% include "components/cards.html" %}
     	  {% endwith %}
 

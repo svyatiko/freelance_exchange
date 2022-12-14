@@ -1,21 +1,20 @@
 from datetime import timedelta
 
+from fastapi import (APIRouter, Depends, HTTPException, Request, Response,
+                     status)
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security.utils import get_authorization_scheme_param
+from jose import JWTError, jwt
+from sqlalchemy.orm import Session
+
 from apis.utils import OAuth2PasswordBearerWithCookie
 from core.config import settings
 from core.hashing import Hasher
 from core.security import create_access_token
+from db.models.users import User_Account
 from db.repository.login import get_user
 from db.session import get_db
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
-from fastapi import Response
-from fastapi import status
-from fastapi.security import OAuth2PasswordRequestForm
-from jose import jwt
-from jose import JWTError
 from schemas.tokens import Token
-from sqlalchemy.orm import Session
 
 # from fastapi.security import OAuth2PasswordBearer
 
@@ -39,6 +38,7 @@ def login_for_access_token(
     db: Session = Depends(get_db),
 ):
     user = authenticate_user(form_data.username, form_data.password, db)
+    print("isUserexist", user)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -48,6 +48,7 @@ def login_for_access_token(
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
+    print("TOKEN:", access_token)
     response.set_cookie(
         key="access_token", value=f"Bearer {access_token}", httponly=True
     )
@@ -79,3 +80,18 @@ def get_current_user_from_token(
     if user is None:
         raise credentials_exception
     return user
+
+
+def get_current_user(request: Request, db: Session):
+    token = request.cookies.get("access_token")
+    scheme, param = get_authorization_scheme_param(token)
+    try:
+        current_user: User_Account = get_current_user_from_token(token=param, db=db)
+        print(f"token:{token}\nparam:{param}\ncur_user:{current_user}")
+    except Exception as e:
+        current_user = None
+        print(
+            f"\nException:{e}\ntoken:{token}\nparam:{param}\ncur_user:{current_user}\n"
+        )
+
+    return current_user

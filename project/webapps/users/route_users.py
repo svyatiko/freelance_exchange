@@ -1,14 +1,11 @@
-from db.repository.users import create_new_user
-from db.session import get_db
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import Request
-from fastapi import responses
-from fastapi import status
+from fastapi import APIRouter, Depends, Request, responses, status
 from fastapi.templating import Jinja2Templates
-from schemas.users import UserCreate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+
+from db.repository.users import create_new_user
+from db.session import get_db
+from schemas.users import UserCreate
 from webapps.users.forms import UserCreateForm
 
 templates = Jinja2Templates(directory="templates")
@@ -26,7 +23,10 @@ async def register(request: Request, db: Session = Depends(get_db)):
     await form.load_data()
     if await form.is_valid():
         user = UserCreate(
-            username=form.username, email=form.email, password=form.password, user_role=form.user_role
+            username=form.username,
+            email=form.email,
+            password=form.password,
+            user_role=form.user_role,
         )
         try:
             user = create_new_user(user=user, db=db)

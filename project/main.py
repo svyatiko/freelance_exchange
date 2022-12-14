@@ -1,20 +1,24 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+
 from core.config import settings
-from webapps.base import api_router as web_app_router
-from db.session import engine
 from db.base import Base
+from db.session import engine
+from webapps.base import api_router as web_app_router
 
 
 def include_router(app):
     app.include_router(web_app_router)
 
+
 def configure_static(app):
     app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 def create_tables():
     print("Create tables")
     Base.metadata.create_all(bind=engine)
+
 
 def start_application():
     app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
@@ -25,6 +29,3 @@ def start_application():
 
 
 app = start_application()
-# @app.get("/")
-# def hello_api():
-#     return {"hello":"hello"}

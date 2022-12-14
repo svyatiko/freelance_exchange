@@ -1,5 +1,4 @@
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import Request
 
@@ -12,14 +11,14 @@ class UserCreateForm:
         self.email: Optional[str] = None
         self.password: Optional[str] = None
         self.user_role: Optional[str] = None
-        
+
     async def load_data(self):
         form = await self.request.form()
         self.username = form.get("username")
         self.email = form.get("email")
         self.password = form.get("password")
         self.user_role = form.get("user_role")
-        
+
     async def is_valid(self):
         if not self.username or not len(self.username) > 3:
             self.errors.append("Username should be > 3 chars")

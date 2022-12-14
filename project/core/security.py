@@ -1,9 +1,9 @@
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Optional
 
-from core.config import settings
 from jose import jwt
+
+from core.config import settings
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
