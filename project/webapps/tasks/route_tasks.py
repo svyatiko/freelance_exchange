@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Request, responses, status
+from fastapi import APIRouter, Depends, Request, Response, responses, status
 from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -14,26 +14,39 @@ from schemas.tasks import CreateTaskMsg, TaskCreate
 from webapps.tasks.forms import TaskCreateForm, TaskMsgForm
 
 templates = Jinja2Templates(directory="templates")
-# include_in_schema=False -> чтобы не видеть в swagger entrypoint
 router = APIRouter(include_in_schema=False)
 
 
 @router.get("/")
 async def home(request: Request, db: Session = Depends(get_db), msg: str = None):
     tasks = list_tasks(db=db)
+    user = get_current_user(request, db=db)
     return templates.TemplateResponse(
-        "general_pages/homepage.html", {"request": request, "tasks": tasks, "msg": msg}
+        "general_pages/homepage.html",
+        {"request": request, "tasks": tasks, "msg": msg, "user": user},
     )
 
 
 @router.get("/post-a-task/")
 def create_task(request: Request, db: Session = Depends(get_db)):
-    return templates.TemplateResponse("tasks/create_task.html", {"request": request})
+    user = get_current_user(request, db=db)
+    return templates.TemplateResponse(
+        "tasks/create_task.html", {"request": request, "user": user}
+    )
+
+
+@router.get("/logout/")
+def logout(response: Response):
+    response = responses.RedirectResponse("/", status_code=302)
+    response.delete_cookie(key="access_token")
+    return response
 
 
 @router.post("/post-a-task/")
 async def create_task(request: Request, db: Session = Depends(get_db)):
     form = TaskCreateForm(request)
+    setattr(form, "user", user)
+    user = get_current_user(request, db=db)
     await form.load_data()
 
     if form.is_valid():
@@ -86,7 +99,13 @@ def task_detail(id: int, request: Request, db: Session = Depends(get_db)):
 
     return templates.TemplateResponse(
         "tasks/detail.html",
-        {"request": request, "task": task, "msgs": msgs, "user_obj": user_obj},
+        {
+            "request": request,
+            "task": task,
+            "msgs": msgs,
+            "user": user,
+            "user_obj": user_obj,
+        },
     )
 
 
@@ -108,10 +127,11 @@ async def task_detail_msg(id: int, request: Request, db: Session = Depends(get_d
         except Exception as e:
             return templates.TemplateResponse(
                 "tasks/detail.html",
-                {"request": request, "task": task, "errors": form.errors},
+                {"request": request, "task": task, "errors": form.errors, "user": user},
             )
     return templates.TemplateResponse(
-        "tasks/detail.html", {"request": request, "task": task, "errors": form.errors}
+        "tasks/detail.html",
+        {"request": request, "task": task, "errors": form.errors, "user": user},
     )
 
 
@@ -127,7 +147,9 @@ def show_tasks_to_delete(request: Request, db: Session = Depends(get_db)):
 def search(
     request: Request, db: Session = Depends(get_db), query: Optional[str] = None
 ):
+    user = get_current_user(request, db=db)
     tasks = search_task(query, db=db)
     return templates.TemplateResponse(
-        "general_pages/homepage.html", {"request": request, "tasks": tasks}
+        "general_pages/homepage.html",
+        {"request": request, "tasks": tasks, "user": user},
     )

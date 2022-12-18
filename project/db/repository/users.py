@@ -20,3 +20,14 @@ def create_new_user(user: UserCreate, db: Session):
     db.commit()
     db.refresh(user)
     return user
+
+
+def update_user_password_by_id(id: int, user: UserCreate, db: Session):
+    existing_user = db.query(User_Account).filter(User_Account.id == id)
+    user.__dict__.update(hashed_password=Hasher.get_password_hash(user.password))
+    delattr(user, "password")
+    if not existing_user.first():
+        return 0
+    existing_user.update(user.__dict__)
+    db.commit()
+    return 1

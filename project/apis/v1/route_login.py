@@ -16,8 +16,6 @@ from db.repository.login import get_user
 from db.session import get_db
 from schemas.tokens import Token
 
-# from fastapi.security import OAuth2PasswordBearer
-
 router = APIRouter()
 
 

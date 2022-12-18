@@ -11,42 +11,40 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/">Home</a>
         </li>
-<!--
-  <li class="nav-item">
-    <a class="nav-link" href="/docs/">Docs</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="/redoc/">Redoc</a>
-  </li>
--->
-  
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Account
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="/register/">Signup</a></li>
-            <li><a class="dropdown-item" href="/login/">Login</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
+        {% if user is not none %}
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">My tasks</a>
         </li>
-      </ul>
-      <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Tasks
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="/post-a-task/">Create Task post</a></li>
-            <li><a class="dropdown-item" href="/delete-task">Delete a post</a></li>
-          </ul>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">Profile</a>
         </li>
+        {% endif %}
       </ul>
-      <form class="d-flex" action="/search/">
-        <input class="form-control me-2" name="query" id="autocomplete" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
-    </div>
+
+        <ul class="navbar-nav gap-3 mb-4 mb-lg-0" >
+        {% if user is none %}
+        <li class="nav-item">
+          <a class="btn btn-outline-primary" href="/register/" role="button">Signup</a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-outline-primary" href="/login/" role="button">Login</a>
+        </li>
+          {% elif user.user_role == 'customer'%}
+        <a class="btn btn-primary" href="/post-a-task/" role="button">Create Task post</a>
+        <a class="btn btn-outline-secondary" href="/logout/" role="button">Logout</a>
+        {% elif user.user_role == 'developer' %}
+        <a class="btn btn-outline-secondary" href="/logout/" role="button">Logout</a>
+        {% endif %}
+        <form class="d-flex" action="/search/">
+          <li class="nav-item">
+          <input class="form-control me-2" name="query" id="autocomplete" type="search" placeholder="Search" aria-label="Search">
+          </li>
+          <li class="nav-item">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+          </li>
+        </form>
+
+      </ul>
+      </div>
   </div>
 </nav>

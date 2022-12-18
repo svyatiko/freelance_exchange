@@ -1,3 +1,5 @@
+import secrets
+import string
 from typing import Dict, Optional
 
 from fastapi import HTTPException, Request, status
@@ -36,3 +38,17 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
             else:
                 return None
         return param
+
+
+def generate_password():
+    letters = string.ascii_letters
+    digits = string.digits
+    alphabet = letters + digits
+
+    pwd_length = 10
+
+    pwd = ""
+
+    for _ in range(pwd_length):
+        pwd += "".join(secrets.choice(alphabet))
+    return pwd

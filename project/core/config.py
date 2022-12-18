@@ -22,5 +22,10 @@ class Settings:
     ALGORITHM = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+    SENDER_EMAIL: str = os.getenv("SENDER_EMAIL")
+    SENDER_PASSWORD: str = os.getenv("SENDER_PASSWORD")
+    SMTP_SERVER_PORT: int = int(os.getenv("SMTP_SERVER_PORT"))
+    SMTP_SERVER: str = os.getenv("SMTP_SERVER")
+
 
 settings = Settings()

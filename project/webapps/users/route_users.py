@@ -3,6 +3,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from apis.v1.route_login import get_current_user
 from db.repository.users import create_new_user
 from db.session import get_db
 from schemas.users import UserCreate
@@ -13,8 +14,11 @@ router = APIRouter(include_in_schema=False)
 
 
 @router.get("/register/")
-def register(request: Request):
-    return templates.TemplateResponse("users/register.html", {"request": request})
+def register(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request, db=db)
+    return templates.TemplateResponse(
+        "users/register.html", {"request": request, "user": user}
+    )
 
 
 @router.post("/register/")

@@ -17,7 +17,6 @@ class TaskCreateForm:
 
     async def load_data(self):
         form = await self.request.form()
-        # print(form)
         self.title = form.get("title")
         self.sphere = form.get("sphere")
         self.stack = form.get("stack")
@@ -51,7 +50,6 @@ class TaskMsgForm:
     async def load_data(self):
         form = await self.request.form()
         self.msg = form.get("msg")
-        print("===========", self.msg)
 
     def is_valid(self):
         if not self.msg or len(self.msg) <= 4:
