@@ -41,38 +41,31 @@
             <td colspan="2">{{task.price}}$</td>
           </tr>
           <tr>
+            <th scope="row">Github</th>
+            <td colspan="2">   
+                <a href="{{task.git_link}}">
+                Github
+                </a>
+            </td>
+          </tr>
+          <tr>
             <th scope="row">Description</th>
             <td colspan="2">{{task.description}}</td>
           </tr>
+          <tr>
+            <th scope="row">Status</th>
+            <td colspan="2">{{task.task_status}}</td>
+          </tr>          
         </tbody>
     </table>
   </div>
 
-{% if not user_obj.is_user_msg_exists%}
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Respond
-</button>
-<br> <br>
+
+{% if user.user_role == 'developer' and task.task_status == 'in process'%}
+<a class="btn btn-primary" href="/finish_task/{{task.id}}" role="button">Finish task</a>
+{% elif user.user_role == 'customer' and task.task_status == 'dev finish' %}
+<a class="btn btn-primary" href="/close_task/{{task.id}}" role="button">Close task</a>
 {% endif %}
-
-{% for msg in msgs%}
-<div class="card">
-  <h5 class="card-header">Nick</h5>
-  <div class="card-body">
-    <p class="card-text">{{msg.msg}}</p>
-    {% if user_obj.is_cust%}
-    <a href="/details/{{task.id}}/choose_dev/{{msg.dev_id}}" class="btn btn-primary">choose</a>
-    {% endif%}
-  </div>
-</div>
-<br><br>
-{% endfor %}
-
-
-
-
-
 
 
 <!-- Modal -->
@@ -98,9 +91,6 @@
     </div>
   </div>
 </div>
-
-  
-
 
 </div>
 {% endblock %}

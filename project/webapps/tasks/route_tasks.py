@@ -7,11 +7,12 @@ from sqlalchemy.orm import Session
 
 from apis.v1.route_login import get_current_user, get_current_user_from_token
 from db.models.users import User_Account
-from db.repository.tasks import (create_msg, create_new_task, list_msgs,
+from db.repository.tasks import (create_msg, create_new_task, list_msgs, my_tasks,set_finish_status_in_task,set_close_status_in_task,my_closed_tasks,
                                  list_tasks, retreive_task, search_task)
 from db.session import get_db
 from schemas.tasks import CreateTaskMsg, TaskCreate
 from webapps.tasks.forms import TaskCreateForm, TaskMsgForm
+from db.repository.tasks import set_dev_in_task
 
 templates = Jinja2Templates(directory="templates")
 router = APIRouter(include_in_schema=False)
@@ -90,7 +91,7 @@ def task_detail(id: int, request: Request, db: Session = Depends(get_db)):
             is_user_msg = [i for i in msgs if i.dev_id == user.id]
             user_obj["is_user_msg_exists"] = True if is_user_msg else False
             user_obj["is_cust"] = False
-        else:
+        if user.id == task.customer_id:
             user_obj["is_user_msg_exists"] = True
             user_obj["is_cust"] = True
     else:
@@ -108,7 +109,19 @@ def task_detail(id: int, request: Request, db: Session = Depends(get_db)):
         },
     )
 
-
+@router.get("/details/{task_id}/choose_dev/{dev_id}")
+def choose_dev(dev_id: int, task_id:int, request: Request, db: Session = Depends(get_db)):
+    print(dev_id, task_id)
+    ok = set_dev_in_task(task_id, dev_id, db)
+    if ok:
+        return responses.RedirectResponse(
+            f"/my-tasks/", status_code=status.HTTP_302_FOUND
+        )
+    else: 
+        return responses.RedirectResponse(
+            f"/details/{task_id}", status_code=status.HTTP_302_FOUND
+        )
+        
 @router.post("/details/{id}")
 async def task_detail_msg(id: int, request: Request, db: Session = Depends(get_db)):
     form = TaskMsgForm(request)
@@ -135,12 +148,64 @@ async def task_detail_msg(id: int, request: Request, db: Session = Depends(get_d
     )
 
 
-@router.get("/delete-task")
+@router.get("/my-tasks")
 def show_tasks_to_delete(request: Request, db: Session = Depends(get_db)):
-    tasks = list_tasks(db=db)
+    user = get_current_user(request, db=db)
+    print(user.id)
+    tasks = my_tasks(user.id, db=db)
+    if user is None:
+        return responses.RedirectResponse(
+            "/", status_code=status.HTTP_302_FOUND
+        )
     return templates.TemplateResponse(
-        "tasks/show_tasks_to_delete.html", {"request": request, "tasks": tasks}
+        "tasks/show_tasks_to_delete.html", {"request": request, "tasks": tasks, 'user': user}
     )
+
+
+@router.get('/go-to-task/{id}')
+def redirect_task(id: int, request: Request, db: Session = Depends(get_db)):
+    task = retreive_task(id=id, db=db)
+    if task.dev_id is None:
+        print("task.dev_id is None")
+        return responses.RedirectResponse(f'/details/{id}', status_code=status.HTTP_302_FOUND)
+    else:
+        return responses.RedirectResponse(f'/my_tasks/{id}', status_code=status.HTTP_302_FOUND)
+
+
+@router.get('/my_tasks/{id}')
+def show_task(id: int, request: Request, db: Session = Depends(get_db)):
+    task = retreive_task(id=id, db=db)
+    user = get_current_user(request, db=db)
+    print("INNNNNNNNNN")
+    return templates.TemplateResponse("tasks/show_task.html", {'request': request, "task": task, 'user': user})
+
+@router.get('/finish_task/{task_id}')
+def finish_task(task_id: int, request: Request, db: Session = Depends(get_db)):
+    set_finish_status_in_task(task_id, db)
+    user = get_current_user(request, db=db)
+    tasks = my_tasks(user.id, db)
+    return templates.TemplateResponse(
+        "tasks/show_tasks_to_delete.html", {"request": request, "tasks": tasks, 'user': user}
+    )
+
+@router.get('/close_task/{task_id}')
+def close_task(task_id: int, request: Request, db: Session = Depends(get_db)):
+    set_close_status_in_task(task_id, db)
+    user = get_current_user(request, db=db)
+    tasks = my_tasks(user.id, db)
+    return templates.TemplateResponse(
+        "tasks/show_tasks_to_delete.html", {"request": request, "tasks": tasks, 'user': user}
+    )
+    
+@router.get('/profile')
+def profile(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request, db=db)
+    task_inf = dict()
+    closed_tasks = my_closed_tasks(user.id, db=db)
+    task_inf['count_closed_tasks'] = len(closed_tasks)
+    return templates.TemplateResponse(
+        "users/profile.html", {"request": request, 'user': user, "task_inf":task_inf}
+    )    
 
 
 @router.get("/search/")
