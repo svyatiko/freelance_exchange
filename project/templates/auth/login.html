@@ -14,13 +14,9 @@
           {% endfor %}
       </div>
 
-      <div class="text-success font-weight-bold">
-        {% if msg %}
-        <div class="badge bg-success text-wrap font-weight-bold" style="font-size: large;">
-          {{msg}}
-        </div>
-        {% endif %}
-      </div>
+          {% with msg=msg %}
+            {% include "components/alerts.html" %}
+          {% endwith %}
     </div>
 
     <div class="row my-5">
@@ -31,7 +27,7 @@
         </div>
         <div class="mb-3">
           <label>Password</label>
-          <input type="password" required placeholder="Choose a secure password" value="{{password}}" name="password" class="form-control">
+          <input type="password" required placeholder="Your password" value="{{password}}" name="password" class="form-control">
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
         <a class="btn btn-outline-secondary" href="/pass_recovery/" role="button">Recover password</a>

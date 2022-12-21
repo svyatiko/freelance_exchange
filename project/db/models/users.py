@@ -6,9 +6,9 @@ from db.base_class import Base
 
 class User_Account(Base):
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, nullable=False)
+    username = Column(String, nullable=False, unique=True)
     hashed_password = Column(String, nullable=False)
-    email = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
     regist_date = Column(Date)
     rate = Column(Integer, nullable=False)
     user_role = Column(String, nullable=False)

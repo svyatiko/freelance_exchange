@@ -22,6 +22,7 @@ class Task_msg(Base):
     id = Column(Integer, primary_key=True)
     task_id = Column(Integer, ForeignKey("task.id"))
     dev_id = Column(Integer, ForeignKey("user_account.id"))
+    dev_username = Column(String, nullable=False)
     msg = Column(String, nullable=False)
     msg_time = Column(Date)
 

@@ -1,5 +1,6 @@
-from sqlalchemy.orm import Session
 from sqlalchemy import or_
+from sqlalchemy.orm import Session
+
 from db.models.tasks import Task, Task_msg
 from schemas.tasks import CreateTaskMsg, TaskCreate
 
@@ -33,29 +34,49 @@ def list_tasks(db: Session):
     tasks = db.query(Task).filter(Task.task_status == "dev not selected").all()
     return tasks
 
+
 def my_tasks(user_id, db: Session):
-    tasks = db.query(Task).filter(or_(Task.dev_id == user_id, Task.customer_id == user_id)).filter(Task.task_status == 'task closed').all()
+    tasks = (
+        db.query(Task)
+        .filter(or_(Task.dev_id == user_id, Task.customer_id == user_id))
+        .all()
+    )
     return tasks
+
 
 def my_closed_tasks(user_id, db: Session):
-    tasks = db.query(Task).filter(or_(Task.dev_id == user_id, Task.customer_id == user_id)).all()
+    tasks = (
+        db.query(Task)
+        .filter(or_(Task.dev_id == user_id, Task.customer_id == user_id))
+        .filter(Task.task_status == "task closed")
+        .all()
+    )
     return tasks
 
+
 def set_dev_in_task(task_id: int, dev_id: int, db: Session):
-    
-    db.query(Task).filter(Task.id == task_id).update({Task.dev_id: dev_id, Task.task_status: 'in process'}, synchronize_session = False)
+    db.query(Task).filter(Task.id == task_id).update(
+        {Task.dev_id: dev_id, Task.task_status: "in process"}, synchronize_session=False
+    )
     db.commit()
     return 1
+
 
 def set_finish_status_in_task(task_id: int, db: Session):
-    db.query(Task).filter(Task.id == task_id).update({Task.task_status: 'dev finish'}, synchronize_session = False)
+    db.query(Task).filter(Task.id == task_id).update(
+        {Task.task_status: "dev finish"}, synchronize_session=False
+    )
     db.commit()
     return 1
 
+
 def set_close_status_in_task(task_id: int, db: Session):
-    db.query(Task).filter(Task.id == task_id).update({Task.task_status: 'task closed'}, synchronize_session = False)
+    db.query(Task).filter(Task.id == task_id).update(
+        {Task.task_status: "task closed"}, synchronize_session=False
+    )
     db.commit()
     return 1
+
 
 # def update_task_by_id(id: int, task: TaskCreate, db: Session, owner_id):
 #     existing_task = db.query(Task).filter(Task.id == id)

@@ -14,7 +14,9 @@
         {% endfor %}
       </div>
     </div>
-
+  {% with msg=msg %}
+    {% include "components/alerts.html" %}
+  {% endwith %}
   <div class="row">
     <div class="col">
       <h1 class="display-5">{{user.username}}</h1>
@@ -50,7 +52,8 @@
     </table>
   </div>
 
-
+  <a class="btn btn-outline-primary" href="#" role="button">History</a>
+  <a class="btn btn-outline-secondary" href="/change_password/" role="button">Change password</a>
 
 
 </div>

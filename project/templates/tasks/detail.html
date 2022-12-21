@@ -58,7 +58,7 @@
 
 {% for msg in msgs%}
 <div class="card">
-  <h5 class="card-header">Nick</h5>
+  <h5 class="card-header">{{msg.dev_username}}</h5>
   <div class="card-body">
     <p class="card-text">{{msg.msg}}</p>
     {% if user_obj.is_cust%}

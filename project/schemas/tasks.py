@@ -44,5 +44,6 @@ class ShowTask(TaskBase):
 class CreateTaskMsg(BaseModel):
     task_id: int
     dev_id: int
+    dev_username: str
     msg: str
     msg_time: date = datetime.datetime.now()
